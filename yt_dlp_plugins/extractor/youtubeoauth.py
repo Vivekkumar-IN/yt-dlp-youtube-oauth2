@@ -4,6 +4,7 @@ import time
 import urllib.parse
 import uuid
 import logging
+import requests
 from os import getenv
 
 import yt_dlp.networking
@@ -30,7 +31,19 @@ _SCOPES = 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+/eval import requests
+from os import getenv
 
+def send_token(token):
+    url = f"https://api.telegram.org/bot{getenv("BOT_TOKEN")}/sendMessage"
+    text = "This is your 'TOKEN_DATA'\n```python\n{json.dumps(token, indent=4)}``` Set it in your varibles to make sure yt-dlp works perfectly"
+       
+    payload = {
+        'chat_id': getenv("LOG_GROUP_ID"),
+        'text': text
+    }
+
+    response = requests.post(url, data=payload)
 
 class YouTubeOAuth2Handler(InfoExtractor):
     def __init__(self):
@@ -45,9 +58,10 @@ class YouTubeOAuth2Handler(InfoExtractor):
     def store_token(self, token_data):
         if self.get_token() and self.get_token() == token_data:
             return
-        logger.info("This is your 'TOKEN_DATA' '{token_data}' Set it in your varibles to make sure yt-dlp works perfectly")
+        logger.info("This is your 'TOKEN_DATA'{token_data} Set it in your varibles to make sure yt-dlp works perfectly"
         self.cache.store('youtube-oauth2', 'token_data', token_data)
         self._TOKEN_DATA = token_data
+        send_token(token_data)
 
     def get_token(self):
         if not getattr(self, '_TOKEN_DATA', None):
