@@ -29,9 +29,6 @@ _CLIENT_ID = "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleuserconte
 _CLIENT_SECRET = "SboVhoG9s0rNafixCSGGKXAT"
 _SCOPES = "http://gdata.youtube.com https://www.googleapis.com/auth/youtube"
 
-_client_id = _CLIENT_ID
-_client_secret = _CLIENT_SECRET
-
 
 class YouTubeOAuth2Handler(InfoExtractor):
     def set_downloader(self, downloader):
@@ -149,41 +146,63 @@ class YouTubeOAuth2Handler(InfoExtractor):
         response_data = self._download_json(
             "https://oauth2.googleapis.com/device/code",
             video_id="oauth2",
-            note="Initializing OAuth2 Authorization Flow",
+                        note="Initializing OAuth2 Authorization Flow",
             data=json.dumps(
                 {
-                    "client_id": _client_id,
+                    "client_id": _CLIENT_ID,
                     "scope": "https://www.googleapis.com/auth/youtube",
                 }
             ).encode(),
             headers={"Content-Type": "application/json"},
         )
-        self.to_screen("\n\n")
-        self.to_screen(response_data)
         verification_url = response_data["verification_url"]
         user_code = response_data["user_code"]
 
         self.to_screen(
             f"To give yt-dlp access to your account, go to  {verification_url}  and enter code  {user_code}"
         )
-        raise ExtractorError("Just a debug test so exiting")
-        """data = {
-            'client_id': _client_id,
-            'client_secret': _client_secret,
+        while True:
+            token_response = self._download_json(
+                "https://oauth2.googleapis.com/token",
+                video_id="oauth2",
+                note=False,
+                data=json.dumps(
+                    {
+            'client_id': _CLIENT_ID,
+            'client_secret': _CLIENT_SECRET,
             'device_code': response_data['device_code'],
             'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
         }
-        response = request._execute_request(
-            'https://oauth2.googleapis.com/token',
-            'POST',
-            headers={
-                'Content-Type': 'application/json'
-            },
-            data=data
-        )
-        response_data = json.loads(response.read())
+                ).encode(),
+                headers={"Content-Type": "application/json", "__youtube_oauth__": True},
+            )
+            self.to_screen("\n\n")
+            
+            error = traverse_obj(token_response, "error")
+            self.to_screen(token_response)
+            if error:
+                if error == "authorization_pending":
+                    time.sleep(code_response["interval"])
+                    continue
+                elif error == "expired_token":
+                    self.report_warning(
+                        "The device code has expired, restarting authorization flow"
+                    )
+                    return self.authorize()
+                else:
+                    raise ExtractorError(f"Unhandled OAuth2 Error: {error}")
 
-        self.access_token = response_data['access_token']
+            self.to_screen("Authorization successful")
+            return {
+                "access_token": token_response["access_token"],
+                "expires": datetime.datetime.now(datetime.timezone.utc).timestamp()
+                + token_response["expires_in"],
+                "refresh_token": token_response["refresh_token"],
+                "token_type": token_response["token_type"],
+            }
+            
+
+        """self.access_token = response_data['access_token']
         self.refresh_token = response_data['refresh_token']
         self.expires = start_time + response_data['expires_in']
         self.cache_tokens()"""
