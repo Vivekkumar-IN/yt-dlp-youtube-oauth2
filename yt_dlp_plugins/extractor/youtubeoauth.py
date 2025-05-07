@@ -174,7 +174,7 @@ class YouTubeOAuth2Handler(InfoExtractor):
                         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
                     }
                 ).encode(),
-                headers={"Content-Type": "application/json", "__youtube_oauth__": True},
+                headers={"Content-Type": "application/json"},
             )
             self.to_screen("\n\n")
 
@@ -182,7 +182,7 @@ class YouTubeOAuth2Handler(InfoExtractor):
             self.to_screen(token_response)
             if error:
                 if error == "authorization_pending":
-                    time.sleep(code_response["interval"])
+                    time.sleep(response_data["interval"])
                     continue
                 elif error == "expired_token":
                     self.report_warning(
