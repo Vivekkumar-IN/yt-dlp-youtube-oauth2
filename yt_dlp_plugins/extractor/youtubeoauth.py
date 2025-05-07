@@ -176,7 +176,11 @@ class YouTubeOAuth2Handler(InfoExtractor):
                         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
                     }
                 ).encode(),
-                headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"},
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0",
+                    "accept-language": "en-US,en",
+                },
             )
             self.to_screen("\n\n")
 
