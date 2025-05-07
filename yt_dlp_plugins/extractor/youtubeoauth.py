@@ -149,14 +149,13 @@ class YouTubeOAuth2Handler(InfoExtractor):
         response_data = self._download_json(
             "https://oauth2.googleapis.com/device/code",
             video_id="oauth2",
-            note="Fetching device code for OAuth",
-            errnote="Failed to get device code",
+                        note="Initializing OAuth2 Authorization Flow",
             data=json.dumps(
                 {
                     "client_id": _client_id,
                     "scope": "https://www.googleapis.com/auth/youtube",
                 }
-            ),
+            ).encode(),
             headers={"Content-Type": "application/json"},
         )
         self.to_screen("\n\n")
