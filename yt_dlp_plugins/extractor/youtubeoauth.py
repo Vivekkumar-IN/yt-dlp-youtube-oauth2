@@ -149,7 +149,7 @@ class YouTubeOAuth2Handler(InfoExtractor):
         response_data = self._download_json(
             "https://oauth2.googleapis.com/device/code",
             video_id="oauth2",
-                        note="Initializing OAuth2 Authorization Flow",
+            note="Initializing OAuth2 Authorization Flow",
             data=json.dumps(
                 {
                     "client_id": _client_id,
