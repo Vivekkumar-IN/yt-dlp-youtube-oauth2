@@ -2,24 +2,17 @@ import datetime
 import importlib
 import inspect
 import json
+import socket
 import time
 import urllib.parse
 import uuid
+from urllib.request import Request, urlopen
 
 import yt_dlp.networking
 from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.extractor.youtube import YoutubeBaseInfoExtractor
 from yt_dlp.utils import ExtractorError
 from yt_dlp.utils.traversal import traverse_obj
-import http.client
-import json
-import logging
-import re
-import socket
-from functools import lru_cache
-from urllib import parse
-from urllib.error import URLError
-from urllib.request import Request, urlopen
 
 _EXCLUDED_IES = ("YoutubeBaseInfoExtractor", "YoutubeTabBaseInfoExtractor")
 
@@ -38,23 +31,21 @@ _CLIENT_ID = "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleuserconte
 _CLIENT_SECRET = "SboVhoG9s0rNafixCSGGKXAT"
 _SCOPES = "http://gdata.youtube.com https://www.googleapis.com/auth/youtube"
 
+
 def _execute_request(
-    url,
-    method=None,
-    headers=None,
-    data=None,
-    timeout=socket._GLOBAL_DEFAULT_TIMEOUT
+    url, method=None, headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT
 ):
     base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
     if headers:
         base_headers.update(headers)
-    if data and not isinstance(data, bytes): # encode data for request
-            data = bytes(json.dumps(data), encoding="utf-8")
+    if data and not isinstance(data, bytes):  # encode data for request
+        data = bytes(json.dumps(data), encoding="utf-8")
     if url.lower().startswith("http"):
         request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
     return urlopen(request, timeout=timeout)  # nosec
+
 
 class YouTubeOAuth2Handler(InfoExtractor):
     def set_downloader(self, downloader):
@@ -197,18 +188,16 @@ class YouTubeOAuth2Handler(InfoExtractor):
         time.sleep(response_data["interval"])
         while True:
             response = _execute_request(
-            'https://oauth2.googleapis.com/token',
-            'POST',
-            headers={
-                'Content-Type': 'application/json'
-            },
-            data={
-                        "client_id": _CLIENT_ID,
-                        "client_secret": _CLIENT_SECRET,
-                        "device_code": response_data["device_code"],
-                        "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-                    }
-        )
+                "https://oauth2.googleapis.com/token",
+                "POST",
+                headers={"Content-Type": "application/json"},
+                data={
+                    "client_id": _CLIENT_ID,
+                    "client_secret": _CLIENT_SECRET,
+                    "device_code": response_data["device_code"],
+                    "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+                },
+            )
             token_response = json.loads(response.read())
             self.to_screen("\n\n")
 
