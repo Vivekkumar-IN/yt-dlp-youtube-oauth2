@@ -158,6 +158,7 @@ class YouTubeOAuth2Handler(InfoExtractor):
                 "User-Agent": "Mozilla/5.0",
                 "Accept": "application/json",
                 "Accept-Language": "en-US,en;q=0.9",
+"If-Match": "*",
             },
         )
         verification_url = response_data["verification_url"]
