@@ -26,6 +26,10 @@ _CLIENT_ID = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleuserconte
 _CLIENT_SECRET = 'SboVhoG9s0rNafixCSGGKXAT'
 _SCOPES = 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube'
 
+# Taken from pytubefix 
+# YouTube on TV client secrets
+_client_id = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
+_client_secret = 'SboVhoG9s0rNafixCSGGKXAT'
 
 class YouTubeOAuth2Handler(InfoExtractor):
 
@@ -120,8 +124,48 @@ class YouTubeOAuth2Handler(InfoExtractor):
             'token_type': token_response['token_type'],
             'refresh_token': token_response.get('refresh_token', refresh_token)
         }
-
+        
     def authorize(self):
+        response_data = self._download_json(
+        'https://oauth2.googleapis.com/device/code',
+        video_id='oauth2',
+        note='Fetching device code for OAuth',
+        errnote='Failed to get device code',
+        data=json.dumps({
+            'client_id': _client_id,
+            'scope': 'https://www.googleapis.com/auth/youtube'
+        }),
+        headers={'Content-Type': 'application/json'}
+    )
+        self.to_screen('\n\n')
+        self.to_screen(response_data)
+        verification_url = response_data['verification_url']
+        user_code = response_data['user_code']
+        
+        self.to_screen(f'To give yt-dlp access to your account, go to  {verification_url}  and enter code  {user_code}')
+        raise ExtractorError("Just a debug test so exiting")
+        """data = {
+            'client_id': _client_id,
+            'client_secret': _client_secret,
+            'device_code': response_data['device_code'],
+            'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
+        }
+        response = request._execute_request(
+            'https://oauth2.googleapis.com/token',
+            'POST',
+            headers={
+                'Content-Type': 'application/json'
+            },
+            data=data
+        )
+        response_data = json.loads(response.read())
+
+        self.access_token = response_data['access_token']
+        self.refresh_token = response_data['refresh_token']
+        self.expires = start_time + response_data['expires_in']
+        self.cache_tokens()"""
+        
+    def __authorize(self):
         code_response = self._download_json(
             'https://www.youtube.com/o/oauth2/device/code',
             video_id='oauth2',
