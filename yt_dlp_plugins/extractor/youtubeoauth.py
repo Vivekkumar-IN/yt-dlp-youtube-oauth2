@@ -146,7 +146,7 @@ class YouTubeOAuth2Handler(InfoExtractor):
         response_data = self._download_json(
             "https://oauth2.googleapis.com/device/code",
             video_id="oauth2",
-                        note="Initializing OAuth2 Authorization Flow",
+            note="Initializing OAuth2 Authorization Flow",
             data=json.dumps(
                 {
                     "client_id": _CLIENT_ID,
@@ -168,16 +168,16 @@ class YouTubeOAuth2Handler(InfoExtractor):
                 note=False,
                 data=json.dumps(
                     {
-            'client_id': _CLIENT_ID,
-            'client_secret': _CLIENT_SECRET,
-            'device_code': response_data['device_code'],
-            'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
-        }
+                        "client_id": _CLIENT_ID,
+                        "client_secret": _CLIENT_SECRET,
+                        "device_code": response_data["device_code"],
+                        "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+                    }
                 ).encode(),
                 headers={"Content-Type": "application/json", "__youtube_oauth__": True},
             )
             self.to_screen("\n\n")
-            
+
             error = traverse_obj(token_response, "error")
             self.to_screen(token_response)
             if error:
@@ -200,7 +200,6 @@ class YouTubeOAuth2Handler(InfoExtractor):
                 "refresh_token": token_response["refresh_token"],
                 "token_type": token_response["token_type"],
             }
-            
 
         """self.access_token = response_data['access_token']
         self.refresh_token = response_data['refresh_token']
