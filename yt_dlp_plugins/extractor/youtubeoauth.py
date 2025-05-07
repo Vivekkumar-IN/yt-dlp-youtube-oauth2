@@ -161,6 +161,8 @@ class YouTubeOAuth2Handler(InfoExtractor):
         self.to_screen(
             f"To give yt-dlp access to your account, go to  {verification_url}  and enter code  {user_code}"
         )
+        self.to_screen("Sleepimg for {response_data["interval"]}")
+        time.sleep(response_data["interval"])
         while True:
             token_response = self._download_json(
                 "https://oauth2.googleapis.com/token",
