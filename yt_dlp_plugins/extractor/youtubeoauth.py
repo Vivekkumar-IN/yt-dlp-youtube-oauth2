@@ -29,10 +29,8 @@ _CLIENT_ID = "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleuserconte
 _CLIENT_SECRET = "SboVhoG9s0rNafixCSGGKXAT"
 _SCOPES = "http://gdata.youtube.com https://www.googleapis.com/auth/youtube"
 
-# Taken from pytubefix
-# YouTube on TV client secrets
-_client_id = "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com"
-_client_secret = "SboVhoG9s0rNafixCSGGKXAT"
+_client_id = _CLIENT_ID
+_client_secret = _CLIENT_SECRET
 
 
 class YouTubeOAuth2Handler(InfoExtractor):
